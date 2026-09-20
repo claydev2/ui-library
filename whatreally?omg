@@ -1314,6 +1314,200 @@ end;
 local BaseGroupbox = {};
 
 do
+function Funcs:AddEspPreview(Idx, Info)
+        Info = Info or {}
+        local Groupbox = self
+        local Container = Groupbox.Container
+
+        local Preview = {
+            Type = 'EspPreview',
+            Config = {
+                Box = true,
+                BoxColor = Color3.fromRGB(255, 255, 255),
+                HealthBar = true,
+                HealthColor = Color3.fromRGB(0, 255, 100),
+                Health = 100,
+                Name = true,
+                NameColor = Color3.fromRGB(255, 255, 255),
+                Distance = true,
+                DistanceColor = Color3.fromRGB(180, 180, 180),
+                Chams = false,
+                ChamsColor = Library.AccentColor,
+            }
+        }
+
+        -- Container Canvas
+        local CanvasOuter = Library:Create('Frame', {
+            BackgroundColor3 = Library.BackgroundColor,
+            BorderColor3 = Library.OutlineColor,
+            BorderMode = Enum.BorderMode.Inset,
+            Size = UDim2.new(1, -4, 0, 210),
+            ZIndex = 5,
+            Parent = Container,
+        })
+
+        Library:AddToRegistry(CanvasOuter, {
+            BackgroundColor3 = 'BackgroundColor',
+            BorderColor3 = 'OutlineColor',
+        })
+
+        local CanvasInner = Library:Create('Frame', {
+            BackgroundColor3 = Color3.fromRGB(15, 15, 15),
+            BorderSizePixel = 0,
+            Position = UDim2.new(0, 1, 0, 1),
+            Size = UDim2.new(1, -2, 1, -2),
+            ClipsDescendants = true,
+            ZIndex = 6,
+            Parent = CanvasOuter,
+        })
+
+        -- Centered Dummy Frame
+        local DollFrame = Library:Create('Frame', {
+            BackgroundTransparency = 1,
+            AnchorPoint = Vector2.new(0.5, 0.5),
+            Position = UDim2.new(0.5, 0, 0.5, 0),
+            Size = UDim2.new(0, 80, 0, 150),
+            ZIndex = 7,
+            Parent = CanvasInner,
+        })
+
+        -- Mannequin Silhouette
+        local DollSilhouette = Library:Create('ImageLabel', {
+            BackgroundTransparency = 1,
+            Position = UDim2.new(0, 5, 0, 5),
+            Size = UDim2.new(1, -10, 1, -10),
+            Image = 'rbxassetid://13470001993', -- Roblox character silhouette asset
+            ImageColor3 = Color3.fromRGB(120, 120, 120),
+            ScaleType = Enum.ScaleType.Fit,
+            ZIndex = 8,
+            Parent = DollFrame,
+        })
+
+        -- Bounding Box (Outer + Main Outline)
+        local BoxOutline = Library:Create('Frame', {
+            BackgroundTransparency = 1,
+            BorderColor3 = Color3.new(0, 0, 0),
+            BorderSizePixel = 1,
+            Size = UDim2.new(1, 0, 1, 0),
+            ZIndex = 9,
+            Parent = DollFrame,
+        })
+
+        local BoxStroke = Library:Create('UIStroke', {
+            Color = Preview.Config.BoxColor,
+            Thickness = 1,
+            Parent = BoxOutline,
+        })
+
+        -- Health Bar Container
+        local HealthBarBg = Library:Create('Frame', {
+            BackgroundColor3 = Color3.fromRGB(10, 10, 10),
+            BorderColor3 = Color3.fromRGB(0, 0, 0),
+            BorderSizePixel = 1,
+            Position = UDim2.new(0, -6, 0, 0),
+            Size = UDim2.new(0, 3, 1, 0),
+            ZIndex = 9,
+            Parent = DollFrame,
+        })
+
+        local HealthBarFill = Library:Create('Frame', {
+            BackgroundColor3 = Preview.Config.HealthColor,
+            BorderSizePixel = 0,
+            AnchorPoint = Vector2.new(0, 1),
+            Position = UDim2.new(0, 0, 1, 0),
+            Size = UDim2.new(1, 0, 1, 0),
+            ZIndex = 10,
+            Parent = HealthBarBg,
+        })
+
+        -- Preview Text Labels
+        local NameTag = Library:CreateLabel({
+            Position = UDim2.new(0, 0, 0, -16),
+            Size = UDim2.new(1, 0, 0, 14),
+            Text = 'Player1',
+            TextSize = 12,
+            TextColor3 = Preview.Config.NameColor,
+            TextXAlignment = Enum.TextXAlignment.Center,
+            ZIndex = 11,
+            Parent = DollFrame,
+        })
+
+        local DistanceTag = Library:CreateLabel({
+            Position = UDim2.new(0, 0, 1, 2),
+            Size = UDim2.new(1, 0, 0, 14),
+            Text = '45m',
+            TextSize = 11,
+            TextColor3 = Preview.Config.DistanceColor,
+            TextXAlignment = Enum.TextXAlignment.Center,
+            ZIndex = 11,
+            Parent = DollFrame,
+        })
+
+        -- Dynamic Update Functions
+        function Preview:SetBoxVisible(visible)
+            Preview.Config.Box = visible
+            BoxOutline.Visible = visible
+        end
+
+        function Preview:SetBoxColor(color)
+            Preview.Config.BoxColor = color
+            BoxStroke.Color = color
+        end
+
+        function Preview:SetHealthBarVisible(visible)
+            Preview.Config.HealthBar = visible
+            HealthBarBg.Visible = visible
+        end
+
+        function Preview:SetHealth(percent)
+            percent = math.clamp(percent, 0, 100)
+            Preview.Config.Health = percent
+            HealthBarFill.Size = UDim2.new(1, 0, percent / 100, 0)
+        end
+
+        function Preview:SetHealthColor(color)
+            Preview.Config.HealthColor = color
+            HealthBarFill.BackgroundColor3 = color
+        end
+
+        function Preview:SetNameVisible(visible)
+            Preview.Config.Name = visible
+            NameTag.Visible = visible
+        end
+
+        function Preview:SetNameColor(color)
+            Preview.Config.NameColor = color
+            NameTag.TextColor3 = color
+        end
+
+        function Preview:SetDistanceVisible(visible)
+            Preview.Config.Distance = visible
+            DistanceTag.Visible = visible
+        end
+
+        function Preview:SetDistanceColor(color)
+            Preview.Config.DistanceColor = color
+            DistanceTag.TextColor3 = color
+        end
+
+        function Preview:SetChams(enabled, color)
+            Preview.Config.Chams = enabled
+            if enabled then
+                DollSilhouette.ImageColor3 = color or Preview.Config.ChamsColor
+            else
+                DollSilhouette.ImageColor3 = Color3.fromRGB(120, 120, 120)
+            end
+        end
+
+        Groupbox:AddBlank(5)
+        Groupbox:Resize()
+
+        if Idx then
+            Options[Idx] = Preview
+        end
+
+        return Preview
+    end
     local Funcs = {};
 
     function Funcs:AddBlank(Size)
