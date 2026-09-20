@@ -1314,6 +1314,7 @@ end;
 local BaseGroupbox = {};
 
 do
+local Funcs = {};
 function Funcs:AddEspPreview(Idx, Info)
         Info = Info or {}
         local Groupbox = self
@@ -1508,7 +1509,7 @@ function Funcs:AddEspPreview(Idx, Info)
 
         return Preview
     end
-    local Funcs = {};
+    
 
     function Funcs:AddBlank(Size)
         local Groupbox = self;
