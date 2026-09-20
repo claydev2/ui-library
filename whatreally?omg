@@ -3464,63 +3464,12 @@ Window.TitleLabel = WindowLabel;
         Parent = ScreenGui;
     });
 
-local OriginalTransparency = {}
-
 function Library.Toggle()
-    if Outer.Visible then
-        local steps = 10
-        local duration = 0.3
-        local stepTime = duration / steps
+    Outer.Visible = not Outer.Visible
+    ModalElement.Modal = Outer.Visible
 
-        -- SAVE original values (only once)
-        for _, descendant in pairs(Outer:GetDescendants()) do
-            if descendant:IsA('GuiObject') then
-                if not OriginalTransparency[descendant] then
-                    OriginalTransparency[descendant] = {
-                        BackgroundTransparency = descendant.BackgroundTransparency,
-                        TextTransparency = descendant:IsA('TextLabel') or descendant:IsA('TextButton') and descendant.TextTransparency or nil
-                    }
-                end
-            end
-        end
-
-        task.spawn(function()
-            for i = 0, steps do
-                local t = i / steps
-
-                for _, descendant in pairs(Outer:GetDescendants()) do
-                    if descendant:IsA('GuiObject') then
-                        descendant.BackgroundTransparency = math.clamp(descendant.BackgroundTransparency + t * 0.5, 0, 1)
-
-                        if descendant:IsA('TextLabel') or descendant:IsA('TextButton') then
-                            descendant.TextTransparency = t
-                        end
-                    end
-                end
-
-                task.wait(stepTime)
-            end
-
-            Outer.Visible = false
-            ModalElement.Modal = false
-        end)
-
+    if not Outer.Visible then
         return
-    else
-        Outer.Visible = true
-        ModalElement.Modal = true
-
-        -- RESTORE original values
-        for obj, props in pairs(OriginalTransparency) do
-            if obj and obj.Parent then
-                if props.BackgroundTransparency then
-                    obj.BackgroundTransparency = props.BackgroundTransparency
-                end
-                if props.TextTransparency ~= nil then
-                    obj.TextTransparency = props.TextTransparency
-                end
-            end
-        end
     end
 
     local Cursor = Drawing.new('Triangle')
